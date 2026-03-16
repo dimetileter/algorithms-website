@@ -1,0 +1,187 @@
+/* ============================================
+   ANA STİL DOSYASI (main.css)
+   Tema değişkenleri, reset ve genel stiller
+   ============================================ */
+
+/* ------------------------------------
+   1) CSS DEĞİŞKENLERİ (Renk Paleti)
+   Gündüz ve Gece modları için renkler
+   ------------------------------------ */
+
+/* Gündüz Modu (varsayılan) */
+:root {
+    /* Ana renkler */
+    --bg-primary: #FFFFFF;
+    /* Ana arka plan: Beyaz */
+    --bg-secondary: #F5F5F7;
+    /* İkincil arka plan: Açık gri (Apple tarzı) */
+    --bg-card: #FFFFFF;
+    /* Kart arka planı */
+
+    /* Metin renkleri */
+    --text-primary: #1D1D1F;
+    /* Ana metin: Koyu siyah */
+    --text-secondary: #6E6E73;
+    /* İkincil metin: Gri */
+
+    /* Vurgu rengi (Apple mavi) */
+    --accent-color: #007AFF;
+    /* Ana vurgu: Mavi */
+    --accent-hover: #0056CC;
+    /* Hover durumu: Koyu mavi */
+
+    /* Kenar ve gölge */
+    --border-color: #E5E5EA;
+    /* Kenarlık rengi */
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    /* Gölge rengi */
+    --shadow-hover: rgba(0, 0, 0, 0.15);
+    /* Hover gölge rengi */
+
+    /* Navbar */
+    --navbar-bg: rgba(255, 255, 255, 0.85);
+    /* Navbar: Yarı saydam beyaz */
+    --navbar-border: #E5E5EA;
+
+    /* Neon efekti (aktif node/kenar) */
+    --neon-glow: #007AFF;
+    /* Neon mavi */
+    --neon-visited: #34C759;
+    /* Ziyaret edilmiş: Yeşil */
+
+    /* Geçiş süresi */
+    --transition-speed: 0.3s;
+    /* Animasyon hızı */
+}
+
+/* Gece Modu */
+[data-theme="dark"] {
+    --bg-primary: #1C1C1E;
+    /* Ana arka plan: Koyu siyah */
+    --bg-secondary: #2C2C2E;
+    /* İkincil arka plan: Antrasit */
+    --bg-card: #2C2C2E;
+    /* Kart arka planı */
+
+    --text-primary: #F5F5F7;
+    /* Ana metin: Açık beyaz */
+    --text-secondary: #98989D;
+    /* İkincil metin: Gri */
+
+    --accent-color: #0A84FF;
+    /* Vurgu: Parlak mavi (gece için) */
+    --accent-hover: #409CFF;
+    /* Hover: Daha açık mavi */
+
+    --border-color: #38383A;
+    /* Kenarlık */
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --shadow-hover: rgba(0, 0, 0, 0.5);
+
+    --navbar-bg: rgba(28, 28, 30, 0.85);
+    /* Navbar: Yarı saydam koyu */
+    --navbar-border: #38383A;
+
+    --neon-glow: #0A84FF;
+    /* Neon mavi (gece) */
+    --neon-visited: #30D158;
+    /* Ziyaret edilmiş: Parlak yeşil */
+}
+
+/* ------------------------------------
+   2) RESET (Tarayıcı Varsayılanlarını Sıfırla)
+   Tüm tarayıcılarda tutarlı görünüm sağlar
+   ------------------------------------ */
+
+/* Tüm elemanların kutu modelini sıfırla */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Sayfa geneli */
+html {
+    font-size: 16px;
+    /* Temel yazı boyutu */
+    scroll-behavior: smooth;
+    /* Yumuşak kaydırma */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    /* Satır yüksekliği */
+    transition: background-color var(--transition-speed) ease,
+        color var(--transition-speed) ease;
+}
+
+/* Bağlantı (link) stilleri */
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+    /* Alt çizgiyi kaldır */
+    transition: color var(--transition-speed) ease;
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+/* Görsel (resim) sıfırlama */
+img {
+    max-width: 100%;
+    /* Taşmayı engelle */
+    display: block;
+}
+
+/* Liste stillerini sıfırla */
+ul,
+ol {
+    list-style: none;
+}
+
+/* Buton sıfırlama */
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+/* ------------------------------------
+   3) GENEL YARDIMCI SINIFLAR
+   Sık kullanılan stil kalıpları
+   ------------------------------------ */
+
+/* İçerik alanını ortalayan konteyner */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    /* Maksimum genişlik */
+    margin: 0 auto;
+    /* Ortala */
+    padding: 0 24px;
+    /* Yanlara boşluk */
+}
+
+/* Gizlenmiş eleman */
+.hidden {
+    display: none !important;
+}
+
+/* Ekran okuyucular için görünmez ama erişilebilir metin */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+}

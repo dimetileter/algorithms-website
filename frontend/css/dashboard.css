@@ -1,0 +1,414 @@
+/* ============================================
+   DASHBOARD STİLLERİ (dashboard.css)
+   Ana sayfa: Hero bölümü ve kart düzeni
+   ============================================ */
+
+/* --- Hero Bölümü (Karşılama Alanı) --- */
+.hero-section {
+    text-align: center;
+    padding: 100px 0 48px 0;
+    /* Üstte navbar boşluğu */
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    /* 40px - Büyük başlık */
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+    /* Harfler arası sıkıştırma (Apple tarzı) */
+}
+
+.hero-subtitle {
+    font-size: 1.125rem;
+    /* 18px */
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto;
+    /* Ortala */
+    line-height: 1.7;
+}
+
+/* --- Dashboard: Algoritma Kartları Grid'i --- */
+.dashboard {
+    display: grid;
+    /* Ekrana simetrik yayılım: minimum 280px, eşit genişlikte kartlar */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    /* Kartlar arası boşluk */
+    padding: 24px 0 64px 0;
+}
+
+/* --- Tek Bir Algoritma Kartı --- */
+.algorithm-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    /* Yuvarlatılmış köşeler */
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Kart hover efekti (Apple tarzı) */
+.algorithm-card:hover {
+    transform: translateY(-4px);
+    /* Hafif yukarı kalk */
+    box-shadow: 0 8px 24px var(--shadow-hover);
+    /* Gölge derinleş */
+    border-color: var(--accent-color);
+}
+
+/* Kart içindeki animasyon alanı */
+.card-animation {
+    width: 100%;
+    height: 140px;
+    /* Animasyon yüksekliği */
+    border-radius: 10px;
+    background-color: var(--bg-secondary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Kart başlığı (algoritma adı) */
+.card-title {
+    font-size: 1.25rem;
+    /* 20px */
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+/* Kart açıklaması */
+.card-description {
+    font-size: 0.875rem;
+    /* 14px */
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+/* --- Karmaşıklık Badge'ı --- */
+.card-complexity {
+    margin-top: auto;
+    /* Aşağıya it */
+}
+
+.complexity-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 100px;
+    /* Oval */
+    font-size: 0.75rem;
+    /* 12px */
+    font-weight: 600;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    /* Kod fontu */
+    color: var(--accent-color);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.algorithm-card:hover .complexity-badge {
+    background-color: var(--accent-color);
+    color: #FFFFFF;
+    border-color: var(--accent-color);
+}
+
+/* ============================================
+   SVG MİNİ-GRAPH STİLLERİ
+   Kart animasyonları için node ve kenar stilleri
+   ============================================ */
+
+/* SVG boyutlandırma */
+.card-svg {
+    width: 85%;
+    height: 85%;
+}
+
+/* --- Temel Kenar (Edge) Stili --- */
+.svg-edge {
+    stroke: var(--border-color);
+    stroke-width: 2;
+    fill: none;
+    transition: stroke var(--transition-speed) ease;
+}
+
+/* Negatif ağırlık kenarı (kırmızımsı) */
+.svg-edge-negative {
+    stroke: #FF453A;
+    stroke-width: 2;
+    stroke-dasharray: 6 3;
+    /* Kesikli çizgi */
+}
+
+/* Aktif kenar (neon mavi glow) */
+.svg-edge-active {
+    stroke: var(--neon-glow);
+    stroke-width: 3;
+    fill: none;
+    filter: drop-shadow(0 0 4px var(--neon-glow));
+}
+
+/* Ağaç kenarı (yeşilimsi) */
+.svg-edge-tree {
+    stroke: var(--neon-visited);
+    stroke-width: 2.5;
+    fill: none;
+    filter: drop-shadow(0 0 3px var(--neon-visited));
+}
+
+/* MST kenarı — Kruskal (yeşil neon) */
+.svg-edge-mst {
+    stroke: var(--neon-visited);
+    stroke-width: 3;
+    fill: none;
+    filter: drop-shadow(0 0 4px var(--neon-visited));
+}
+
+/* Prim kenarı (mavi neon) */
+.svg-edge-prim {
+    stroke: var(--neon-glow);
+    stroke-width: 3;
+    fill: none;
+    filter: drop-shadow(0 0 4px var(--neon-glow));
+}
+
+/* --- Temel Node Stili --- */
+.svg-node {
+    fill: var(--bg-secondary);
+    stroke: var(--text-secondary);
+    stroke-width: 2;
+    transition: all var(--transition-speed) ease;
+}
+
+/* Başlangıç node'u (mavi) */
+.svg-node-start {
+    fill: var(--accent-color);
+    stroke: var(--accent-color);
+    filter: drop-shadow(0 0 4px var(--accent-color));
+}
+
+/* Bitiş node'u (yeşil) */
+.svg-node-end {
+    fill: var(--neon-visited);
+    stroke: var(--neon-visited);
+    filter: drop-shadow(0 0 4px var(--neon-visited));
+}
+
+/* Aktif node (neon glow) */
+.svg-node-active {
+    fill: var(--neon-glow);
+    stroke: var(--neon-glow);
+    filter: drop-shadow(0 0 6px var(--neon-glow));
+}
+
+/* Ağaç kök node */
+.svg-node-root {
+    fill: var(--accent-color);
+    stroke: var(--accent-color);
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+/* Ağaç ara node */
+.svg-node-tree {
+    fill: var(--neon-visited);
+    stroke: var(--neon-visited);
+    filter: drop-shadow(0 0 3px var(--neon-visited));
+}
+
+/* Yaprak node */
+.svg-node-leaf {
+    fill: var(--bg-secondary);
+    stroke: var(--neon-visited);
+    stroke-width: 2;
+}
+
+/* Prim büyüme node */
+.svg-node-prim {
+    fill: var(--neon-glow);
+    stroke: var(--neon-glow);
+}
+
+/* Negatif ağırlık metni */
+.svg-weight-negative {
+    fill: #FF453A;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: monospace;
+}
+
+/* ============================================
+   ANİMASYONLAR (Loop)
+   Her kart için sürekli döngüde çalışır
+   ============================================ */
+
+/* --- Neon Pulse: Yanıp sönen efekt (Dijkstra) --- */
+.svg-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 6px var(--neon-glow));
+    }
+
+    50% {
+        opacity: 0.3;
+        filter: drop-shadow(0 0 2px var(--neon-glow));
+    }
+}
+
+/* Yavaş pulse (Bellman-Ford) */
+.svg-pulse-slow {
+    animation: pulse 3s ease-in-out infinite;
+}
+
+/* --- Ağaç Dallanma: Büyüme efekti (Spanning Tree) --- */
+.svg-grow {
+    stroke-dasharray: 80;
+    stroke-dashoffset: 80;
+    animation: grow 2s ease forwards infinite;
+}
+
+.svg-grow-delay {
+    stroke-dasharray: 60;
+    stroke-dashoffset: 60;
+    animation: grow-small 2s ease 0.8s forwards infinite;
+}
+
+@keyframes grow {
+    0% {
+        stroke-dashoffset: 80;
+    }
+
+    50% {
+        stroke-dashoffset: 0;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes grow-small {
+    0% {
+        stroke-dashoffset: 60;
+    }
+
+    50% {
+        stroke-dashoffset: 0;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* --- MST Kenar Ekleme: Sıralı gösterim (Kruskal) --- */
+.svg-appear-1 {
+    animation: appear 4s ease infinite;
+}
+
+.svg-appear-2 {
+    animation: appear 4s ease 1s infinite;
+}
+
+.svg-appear-3 {
+    animation: appear 4s ease 2s infinite;
+}
+
+.svg-appear-4 {
+    animation: appear 4s ease 3s infinite;
+}
+
+@keyframes appear {
+
+    0%,
+    10% {
+        opacity: 0;
+        stroke-width: 1;
+    }
+
+    25%,
+    100% {
+        opacity: 1;
+        stroke-width: 3;
+    }
+}
+
+/* --- Prim Büyüme: Sıralı kenar genişleme --- */
+.svg-expand-1 {
+    animation: appear 4s ease 0.2s infinite;
+}
+
+.svg-expand-2 {
+    animation: appear 4s ease 1s infinite;
+}
+
+.svg-expand-3 {
+    animation: appear 4s ease 1.8s infinite;
+}
+
+.svg-expand-4 {
+    animation: appear 4s ease 2.6s infinite;
+}
+
+/* Prim node fade-in */
+.svg-fadein-1 {
+    animation: fadein 4s ease 0.2s infinite;
+}
+
+.svg-fadein-2 {
+    animation: fadein 4s ease 1.8s infinite;
+}
+
+.svg-fadein-3 {
+    animation: fadein 4s ease 1s infinite;
+}
+
+.svg-fadein-4 {
+    animation: fadein 4s ease 2.6s infinite;
+}
+
+@keyframes fadein {
+
+    0%,
+    10% {
+        opacity: 0.2;
+        r: 3;
+    }
+
+    25%,
+    100% {
+        opacity: 1;
+        r: 7;
+    }
+}
+
+/* --- Footer (Alt Bilgi) --- */
+.footer {
+    text-align: center;
+    padding: 24px 0;
+    border-top: 1px solid var(--border-color);
+    transition: border-color var(--transition-speed) ease;
+}
+
+.footer-text {
+    font-size: 0.8125rem;
+    /* 13px */
+    color: var(--text-secondary);
+}

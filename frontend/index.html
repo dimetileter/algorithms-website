@@ -1,0 +1,234 @@
+<!-- ============================================
+     ANA GİRİŞ SAYFASI (index.html)
+     Projenin ana giriş noktası
+     ============================================ -->
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Algoritma Görselleştirici - Dijkstra, Bellman-Ford, Kruskal, Prim ve Spanning Tree algoritmalarını interaktif olarak keşfedin.">
+    <title>Algoritma Görselleştirici</title>
+
+    <!-- Stil dosyaları -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+    <!-- ===== ÜST MENÜ (Navbar) ===== -->
+    <nav class="navbar" id="navbar">
+        <div class="container navbar-content">
+
+            <!-- Sol: Logo / Proje Adı -->
+            <a href="index.html" class="navbar-brand" id="navbar-brand">
+                Algoritma Görselleştirici
+            </a>
+
+            <!-- Orta: Navigasyon Linkleri (şimdilik boş, algoritmalar eklenince dolacak) -->
+            <ul class="navbar-links" id="navbar-links">
+                <!-- İleride algoritma linkleri buraya eklenecek -->
+            </ul>
+
+            <!-- Sağ: Arama Kutusu + Tema Toggle -->
+            <div class="navbar-actions">
+
+                <!-- Arama Kutusu (oval, ikon sağda) -->
+                <div class="search-box" id="search-box">
+                    <input type="text" class="search-input" id="search-input" placeholder="Ara..."
+                        aria-label="Algoritma ara">
+                    <button class="search-toggle" id="search-toggle" aria-label="Ara">
+                        🔍
+                    </button>
+                </div>
+                <!-- Tema Toggle (Gece/Gündüz) -->
+                <button class="theme-toggle" id="theme-toggle" aria-label="Tema değiştir">
+                    🌙
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== ANA İÇERİK ALANI ===== -->
+    <main class="main-content" id="main-content">
+        <div class="container">
+
+            <!-- Başlık Bölümü -->
+            <section class="hero-section" id="hero-section">
+                <h1 class="hero-title">Algoritma Görselleştirici</h1>
+                <p class="hero-subtitle">
+                    Graph algoritmalarını adım adım görselleştirin,
+                    kendi graph'ınızı oluşturun ve algoritmaları keşfedin.
+                </p>
+            </section>
+
+            <!-- Algoritma Kartları (Dashboard) -->
+            <section class="dashboard" id="dashboard">
+
+                <!-- Kart 1: Dijkstra -->
+                <article class="algorithm-card" id="card-dijkstra" data-algorithm="dijkstra">
+                    <div class="card-animation" id="anim-dijkstra">
+                        <svg viewBox="0 0 200 100" class="card-svg">
+                            <!-- Basit graph: 4 node, kenarlar ve en kısa yol vurgusu -->
+                            <line x1="30" y1="50" x2="90" y2="20" class="svg-edge" />
+                            <line x1="30" y1="50" x2="90" y2="80" class="svg-edge" />
+                            <line x1="90" y1="20" x2="170" y2="50" class="svg-edge" />
+                            <line x1="90" y1="80" x2="170" y2="50" class="svg-edge" />
+                            <!-- En kısa yol (neon efekti) -->
+                            <line x1="30" y1="50" x2="90" y2="20" class="svg-edge-active svg-pulse" />
+                            <line x1="90" y1="20" x2="170" y2="50" class="svg-edge-active svg-pulse" />
+                            <!-- Node'lar -->
+                            <circle cx="30" cy="50" r="8" class="svg-node svg-node-start" />
+                            <circle cx="90" cy="20" r="8" class="svg-node svg-node-active svg-pulse" />
+                            <circle cx="90" cy="80" r="8" class="svg-node" />
+                            <circle cx="170" cy="50" r="8" class="svg-node svg-node-end" />
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Dijkstra</h3>
+                    <p class="card-description">Ağırlıklı graf üzerinde en kısa yolu bulan algoritma.</p>
+                    <div class="card-complexity">
+                        <span class="complexity-badge">O((V+E) log V)</span>
+                    </div>
+                </article>
+
+                <!-- Kart 2: Bellman-Ford -->
+                <article class="algorithm-card" id="card-bellman-ford" data-algorithm="bellman-ford">
+                    <div class="card-animation" id="anim-bellman-ford">
+                        <svg viewBox="0 0 200 100" class="card-svg">
+                            <!-- Graph: negatif ağırlıklı kenarlar -->
+                            <line x1="30" y1="50" x2="100" y2="20" class="svg-edge" />
+                            <line x1="100" y1="20" x2="170" y2="50" class="svg-edge" />
+                            <line x1="30" y1="50" x2="100" y2="80" class="svg-edge svg-edge-negative" />
+                            <line x1="100" y1="80" x2="170" y2="50" class="svg-edge" />
+                            <!-- Tarama efekti -->
+                            <line x1="30" y1="50" x2="100" y2="80" class="svg-edge-active svg-pulse-slow" />
+                            <!-- Node'lar -->
+                            <circle cx="30" cy="50" r="8" class="svg-node svg-node-start" />
+                            <circle cx="100" cy="20" r="8" class="svg-node" />
+                            <circle cx="100" cy="80" r="8" class="svg-node svg-node-active svg-pulse-slow" />
+                            <circle cx="170" cy="50" r="8" class="svg-node svg-node-end" />
+                            <!-- Negatif ağırlık etiketi -->
+                            <text x="52" y="74" class="svg-weight-negative">-2</text>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Bellman-Ford</h3>
+                    <p class="card-description">Negatif ağırlıklara sahip graflarda en kısa yolu bulur.</p>
+                    <div class="card-complexity">
+                        <span class="complexity-badge">O(V · E)</span>
+                    </div>
+                </article>
+
+                <!-- Kart 3: Spanning Tree -->
+                <article class="algorithm-card" id="card-spanning-tree" data-algorithm="spanning-tree">
+                    <div class="card-animation" id="anim-spanning-tree">
+                        <svg viewBox="0 0 200 100" class="card-svg">
+                            <!-- Ağaç yapısı: dallanma animate -->
+                            <line x1="100" y1="15" x2="50" y2="50" class="svg-edge-tree svg-grow" />
+                            <line x1="100" y1="15" x2="150" y2="50" class="svg-edge-tree svg-grow" />
+                            <line x1="50" y1="50" x2="25" y2="85" class="svg-edge-tree svg-grow-delay" />
+                            <line x1="50" y1="50" x2="75" y2="85" class="svg-edge-tree svg-grow-delay" />
+                            <line x1="150" y1="50" x2="125" y2="85" class="svg-edge-tree svg-grow-delay" />
+                            <line x1="150" y1="50" x2="175" y2="85" class="svg-edge-tree svg-grow-delay" />
+                            <!-- Node'lar -->
+                            <circle cx="100" cy="15" r="7" class="svg-node svg-node-root" />
+                            <circle cx="50" cy="50" r="6" class="svg-node svg-node-tree" />
+                            <circle cx="150" cy="50" r="6" class="svg-node svg-node-tree" />
+                            <circle cx="25" cy="85" r="5" class="svg-node svg-node-leaf" />
+                            <circle cx="75" cy="85" r="5" class="svg-node svg-node-leaf" />
+                            <circle cx="125" cy="85" r="5" class="svg-node svg-node-leaf" />
+                            <circle cx="175" cy="85" r="5" class="svg-node svg-node-leaf" />
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Spanning Tree</h3>
+                    <p class="card-description">Grafın tüm düğümlerini kapsayan alt ağaç yapısı.</p>
+                    <div class="card-complexity">
+                        <span class="complexity-badge">O(V + E)</span>
+                    </div>
+                </article>
+
+                <!-- Kart 4: Kruskal -->
+                <article class="algorithm-card" id="card-kruskal" data-algorithm="kruskal">
+                    <div class="card-animation" id="anim-kruskal">
+                        <svg viewBox="0 0 200 100" class="card-svg">
+                            <!-- Kenarlar (sırayla ekleniyor efekti) -->
+                            <line x1="40" y1="30" x2="100" y2="15" class="svg-edge" />
+                            <line x1="100" y1="15" x2="160" y2="30" class="svg-edge" />
+                            <line x1="40" y1="30" x2="60" y2="80" class="svg-edge" />
+                            <line x1="160" y1="30" x2="140" y2="80" class="svg-edge" />
+                            <line x1="60" y1="80" x2="140" y2="80" class="svg-edge" />
+                            <!-- MST kenarları (yeşil, sırayla açılır) -->
+                            <line x1="40" y1="30" x2="100" y2="15" class="svg-edge-mst svg-appear-1" />
+                            <line x1="40" y1="30" x2="60" y2="80" class="svg-edge-mst svg-appear-2" />
+                            <line x1="100" y1="15" x2="160" y2="30" class="svg-edge-mst svg-appear-3" />
+                            <line x1="60" y1="80" x2="140" y2="80" class="svg-edge-mst svg-appear-4" />
+                            <!-- Node'lar -->
+                            <circle cx="40" cy="30" r="7" class="svg-node" />
+                            <circle cx="100" cy="15" r="7" class="svg-node" />
+                            <circle cx="160" cy="30" r="7" class="svg-node" />
+                            <circle cx="60" cy="80" r="7" class="svg-node" />
+                            <circle cx="140" cy="80" r="7" class="svg-node" />
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Kruskal</h3>
+                    <p class="card-description">Kenar tabanlı minimum kapsayan ağaç oluşturma algoritması.</p>
+                    <div class="card-complexity">
+                        <span class="complexity-badge">O(E log E)</span>
+                    </div>
+                </article>
+
+                <!-- Kart 5: Prim -->
+                <article class="algorithm-card" id="card-prim" data-algorithm="prim">
+                    <div class="card-animation" id="anim-prim">
+                        <svg viewBox="0 0 200 100" class="card-svg">
+                            <!-- Kenarlar -->
+                            <line x1="100" y1="15" x2="40" y2="45" class="svg-edge" />
+                            <line x1="100" y1="15" x2="160" y2="45" class="svg-edge" />
+                            <line x1="40" y1="45" x2="70" y2="85" class="svg-edge" />
+                            <line x1="160" y1="45" x2="130" y2="85" class="svg-edge" />
+                            <line x1="70" y1="85" x2="130" y2="85" class="svg-edge" />
+                            <!-- Prim büyüme efekti (merkezden dışarı) -->
+                            <line x1="100" y1="15" x2="40" y2="45" class="svg-edge-prim svg-expand-1" />
+                            <line x1="40" y1="45" x2="70" y2="85" class="svg-edge-prim svg-expand-2" />
+                            <line x1="100" y1="15" x2="160" y2="45" class="svg-edge-prim svg-expand-3" />
+                            <line x1="70" y1="85" x2="130" y2="85" class="svg-edge-prim svg-expand-4" />
+                            <!-- Node'lar (merkezden dışarı büyüme) -->
+                            <circle cx="100" cy="15" r="8" class="svg-node svg-node-start" />
+                            <circle cx="40" cy="45" r="7" class="svg-node svg-node-prim svg-fadein-1" />
+                            <circle cx="160" cy="45" r="7" class="svg-node svg-node-prim svg-fadein-2" />
+                            <circle cx="70" cy="85" r="6" class="svg-node svg-node-prim svg-fadein-3" />
+                            <circle cx="130" cy="85" r="6" class="svg-node svg-node-prim svg-fadein-4" />
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Prim</h3>
+                    <p class="card-description">Düğüm tabanlı minimum kapsayan ağaç oluşturma algoritması.</p>
+                    <div class="card-complexity">
+                        <span class="complexity-badge">O((V+E) log V)</span>
+                    </div>
+                </article>
+
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ===== ALT BİLGİ (Footer) ===== -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <p class="footer-text">
+                Algoritmalar Dersi Ödevi &copy; 2026
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Dosyaları -->
+    <script src="js/theme.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>

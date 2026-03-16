@@ -1,0 +1,168 @@
+/* ============================================
+   NAVBAR STİLLERİ (navbar.css)
+   Üst menü çubuğu tasarımı
+   ============================================ */
+
+/* --- Navbar Ana Yapısı --- */
+.navbar {
+    position: fixed;
+    /* Sayfada sabit kalır */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    /* Her şeyin üstünde */
+    background-color: var(--navbar-bg);
+    border-bottom: 1px solid var(--navbar-border);
+    backdrop-filter: blur(20px);
+    /* Arkayı bulanıklaştır (Apple efekti) */
+    -webkit-backdrop-filter: blur(20px);
+    transition: background-color var(--transition-speed) ease;
+}
+
+/* Navbar iç düzeni */
+.navbar-content {
+    display: flex;
+    /* Yatay hizala */
+    align-items: center;
+    /* Dikeyde ortala */
+    justify-content: space-between;
+    /* Uçlara dağıt */
+    height: 56px;
+    /* Sabit yükseklik */
+}
+
+/* --- Sol: Logo / Proje Adı --- */
+.navbar-brand {
+    font-size: 1.125rem;
+    /* 18px */
+    font-weight: 600;
+    /* Yarı kalın */
+    color: var(--text-primary);
+    transition: color var(--transition-speed) ease;
+}
+
+.navbar-brand:hover {
+    color: var(--accent-color);
+}
+
+/* --- Orta: Navigasyon Linkleri --- */
+.navbar-links {
+    display: flex;
+    gap: 8px;
+    /* Linkler arası boşluk */
+}
+
+.navbar-links li a {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    /* 14px */
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all var(--transition-speed) ease;
+}
+
+.navbar-links li a:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* --- Sağ: Arama + Tema Toggle --- */
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Arama kutusu konteyner (oval kısa kutu) */
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 100px;
+    /* Tam oval köşeler */
+    padding: 4px 4px 4px 14px;
+    /* Sol: metin boşluğu, sağ: ikon için */
+    width: 42px;
+    /* Kısa oval: sadece ikon sığacak kadar */
+    height: 36px;
+    overflow: hidden;
+    /* Taşmayı gizle */
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.search-box:hover {
+    border-color: var(--accent-color);
+}
+
+/* Arama input alanı (varsayılan: gizli) */
+.search-input {
+    width: 0;
+    /* Başlangıçta genişlik yok */
+    border: none;
+    outline: none;
+    background: transparent;
+    /* Arka plan şeffaf (kutu zaten renkli) */
+    color: var(--text-primary);
+    font-size: 0.8125rem;
+    /* 13px */
+    opacity: 0;
+    /* Görünmez */
+    padding: 0;
+    transition: all var(--transition-speed) ease;
+}
+
+.search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Arama butonu (büyüteç ikonu — kutunun sağ tarafında) */
+.search-toggle {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    /* Küçülmesini engelle */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+    /* Küçük ikon */
+    transition: background-color var(--transition-speed) ease;
+}
+
+.search-toggle:hover {
+    background-color: var(--border-color);
+}
+
+/* Arama kutusu açıkken (genişlemiş hali) */
+.search-box.active {
+    width: 240px;
+    /* Genişleyerek açılır */
+}
+
+.search-box.active .search-input {
+    width: 100%;
+    /* Input alanı tüm boşluğu kaplar */
+    opacity: 1;
+    padding: 0 8px;
+}
+
+/* Tema toggle butonu */
+.theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.theme-toggle:hover {
+    background-color: var(--bg-secondary);
+}

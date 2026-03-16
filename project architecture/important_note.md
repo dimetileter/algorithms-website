@@ -1,0 +1,2 @@
+## Yapay Zeka Ajanı için Önemli NOT!
+- Bu projenin genel yaısı ve istenler açıklanmıştır. Ancak hiçbir adım sorulmadan, anlaşılmadan ve onay alınmadan yazılmaya başlanmayacaktır. Öncelikle proje yapısı kurgulanacak, bu yapı bana sorulacak (zaten beraber kurgulyor olacağız) daha sonra koda dökülecek. Büyük parçalar her daim küçük alt adımlara bölünerek ilerlenecek. Tüm sayfa/sayfalar bir anda kodlanmaya başlanmayacak. Her bir sayfa, her bir modül, her bir fonksiyon ayrı ayrı ele alınacak ve onay alındıktan sonra devam edilecek.
