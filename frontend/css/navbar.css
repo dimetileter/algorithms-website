@@ -30,6 +30,8 @@
     /* Uçlara dağıt */
     height: 56px;
     /* Sabit yükseklik */
+    max-width: 100% !important; /* Standart 1200px sınırını kaldır */
+    padding: 0 40px !important; /* Kenarlara yasla, 40px boşluk bırak */
 }
 
 /* --- Sol: Logo / Proje Adı --- */
@@ -85,8 +87,8 @@
     /* Tam oval köşeler */
     padding: 4px 4px 4px 14px;
     /* Sol: metin boşluğu, sağ: ikon için */
-    width: 42px;
-    /* Kısa oval: sadece ikon sığacak kadar */
+    width: 110px;
+    /* Kapalıyken artık biraz daha geniş */
     height: 36px;
     overflow: hidden;
     /* Taşmayı gizle */
@@ -98,10 +100,10 @@
     border-color: var(--accent-color);
 }
 
-/* Arama input alanı (varsayılan: gizli) */
+/* Arama input alanı */
 .search-input {
-    width: 0;
-    /* Başlangıçta genişlik yok */
+    width: 100%;
+    /* Başlangıçta görünür ve yer kaplar */
     border: none;
     outline: none;
     background: transparent;
@@ -109,9 +111,9 @@
     color: var(--text-primary);
     font-size: 0.8125rem;
     /* 13px */
-    opacity: 0;
-    /* Görünmez */
-    padding: 0;
+    opacity: 1;
+    /* Artık görünür */
+    padding: 0 4px;
     transition: all var(--transition-speed) ease;
 }
 

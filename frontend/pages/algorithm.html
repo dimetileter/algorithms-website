@@ -1,1 +1,468 @@
-<!-- Algoritma sayfası şablonu - daha sonra eklenecek -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritma Çalışıyor...</title>
+    <!-- Stil dosyaları -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/algorithm-page.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="container navbar-content">
+            <!-- Sol: Geri Dön + Algoritma Adı -->
+            <div style="display: flex; align-items: center; height: 100%;">
+                <a href="../index.html" class="navbar-brand" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                    <span style="font-size: 1.25rem; line-height: 1; transform: translateY(-1px);">&larr;</span>
+                    <span style="line-height: 1;">Geri Dön</span>
+                </a>
+                <div style="height: 20px; width: 1px; background-color: var(--border-color); margin: 0 16px;"></div>
+                <h2 id="algo-title" style="margin: 0; font-size: 1.125rem; font-weight: 500; line-height: 1; color: var(--text-primary);">Algoritma Adı</h2>
+            </div>
+            
+            <!-- Sağ: Tema Toggle -->
+            <div class="navbar-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Tema değiştir">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- İkiye Bölünmüş Sayfa Düzeni -->
+    <main class="algo-container">
+        
+        <!-- Sol Panel: Graph Görselleştirme Alanı -->
+        <section class="visualization-panel">
+            <div class="canvas-container">
+                <!-- SVG'ye viewBox ekleyerek duyarlı (responsive) boyutlandırma sağlandı -->
+                <svg id="graph-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+                    <!-- Graf elemanları (JS ile çizilecek) -->
+                </svg>
+            </div>
+            <!-- Kontrol Çubuğu -->
+            <div class="controls-bar">
+                <button id="btn-play" class="btn">
+                    <span>Başlat</span>
+                    <div class="spinner"></div>
+                </button>
+                <button id="btn-pause" class="btn">Duraklat</button>
+                <button id="btn-step" class="btn">İleri Adım</button>
+                <button id="btn-reset" class="btn">Sıfırla</button>
+                <div class="speed-control">
+                    <label for="speed-slider">Hız:</label>
+                    <input type="range" id="speed-slider" min="100" max="2000" value="1000" style="direction: rtl;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Sağ Panel: Bilgi ve Adım İlerleme Paneli -->
+        <section class="info-panel">
+            
+            <div class="tabs">
+                <button class="tab-btn active" id="tab-ilerleme">İlerleme</button>
+                <button class="tab-btn" id="tab-aciklama">Açıklama</button>
+            </div>
+
+            <!-- Adım günlüğü ve durum takip -->
+            <div id="execution-log">
+                
+                <div class="panel-section" style="max-height: 250px; overflow-y: auto;">
+                    <h3>Durum Tablosu</h3>
+                    <table id="distance-table">
+                        <thead>
+                            <tr>
+                                <th>Düğüm</th>
+                                <th>Mesafe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Veriler buraya eklenecek -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="panel-section log-wrapper">
+                    <h3>İşlem Adımları</h3>
+                    <div id="log-container">
+                        <!-- Algoritma logları buraya eklenecek -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Algoritma Açıklama Bölümü (Açıklama Tab'i içeriği) -->
+            <div id="algorithm-description" style="display: none; padding: 20px;">
+                <h3 id="desc-title" style="margin-bottom: 15px; color: var(--accent-color);">Algoritma Mantığı</h3>
+                <p id="desc-content" style="color: var(--text-secondary); line-height: 1.6;">
+                    Bu sekme algoritmanın adım adım nasıl çalıştığını, <b>zaman ve alan karmaşıklığı (Big O Notation)</b> 
+                    bilgilerini ve pseudocode'unu açıklamak üzere ayrılmıştır. 
+                    <br><br>
+                    İlerleyen aşamalarda her algoritmanın kendi detaylı teorik ders notu burada belirecektir.
+                </p>
+            </div>
+            
+        </section>
+
+    </main>
+
+    <!-- Veri Yapıları ve Algoritmalar -->
+    <script src="../../structures/graph.js"></script>
+    <script src="../../structures/priority-queue.js"></script>
+    <script src="../../algorithms/dijkstra.js"></script>
+    <script src="../../algorithms/bellman-ford.js"></script>
+    <script src="../../algorithms/spanning-tree.js"></script>
+    <script src="../../algorithms/kruskal.js"></script>
+    <script src="../../algorithms/prim.js"></script>
+
+    <!-- Uygulama Dosyaları -->
+    <script src="../js/theme.js"></script>
+    
+    <!-- Görselleştirme Mantığı -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const algo = urlParams.get('algo');
+            
+            if (algo === 'dijkstra') {
+                document.getElementById('algo-title').textContent = "Dijkstra Algoritması";
+                initDijkstraExample();
+            } else if (algo === 'bellman-ford') {
+                document.getElementById('algo-title').textContent = "Bellman-Ford Algoritması";
+                initBellmanFordExample();
+            } else if (algo === 'kruskal') {
+                document.getElementById('algo-title').textContent = "Kruskal Algoritması (MST)";
+                initKruskalExample();
+            } else if (algo === 'prim') {
+                document.getElementById('algo-title').textContent = "Prim Algoritması (MST)";
+                initPrimExample();
+            } else if (algo === 'spanning-tree') {
+                document.getElementById('algo-title').textContent = "Spanning Tree (DFS)";
+                initSpanningTreeExample();
+            } else {
+                document.getElementById('algo-title').textContent = "Bilinmeyen Algoritma (Dijkstra Gösteriliyor)";
+                initDijkstraExample();
+            }
+        });
+
+        function getCommonGraph() {
+            const g = new Graph(false);
+            const nodes = {
+                'A': {x: 150, y: 300}, 'B': {x: 350, y: 150}, 'C': {x: 350, y: 450}, 
+                'D': {x: 550, y: 300}, 'E': {x: 750, y: 150}, 'F': {x: 750, y: 450}, 'Z': {x: 900, y: 300}
+            };
+            for (const [id, pos] of Object.entries(nodes)) {
+                g.addNode(id, id, pos.x, pos.y);
+            }
+            g.addEdge('A', 'B', 4);  g.addEdge('A', 'C', 2);
+            g.addEdge('B', 'C', 1);  g.addEdge('B', 'D', 5);
+            g.addEdge('C', 'D', 8);  g.addEdge('C', 'F', 10);
+            g.addEdge('D', 'E', 2);  g.addEdge('D', 'F', 6);
+            g.addEdge('E', 'F', 3);  g.addEdge('E', 'Z', 3);
+            g.addEdge('F', 'Z', 5);
+            return g;
+        }
+
+        function initDijkstraExample() {
+            const g = getCommonGraph();
+            drawGraph(g);
+            const result = Dijkstra.run(g, 'A', 'Z');
+            setupAlgorithmPlayControls(g, result);
+        }
+
+        function initBellmanFordExample() {
+            const g = getCommonGraph();
+            drawGraph(g);
+            const result = BellmanFord.run(g, 'A', 'Z');
+            setupAlgorithmPlayControls(g, result);
+        }
+
+        function initKruskalExample() {
+            const g = getCommonGraph();
+            drawGraph(g);
+            const result = Kruskal.run(g);
+            setupAlgorithmPlayControls(g, result);
+        }
+
+        function initPrimExample() {
+            const g = getCommonGraph();
+            drawGraph(g);
+            const result = Prim.run(g, 'A');
+            setupAlgorithmPlayControls(g, result);
+        }
+
+        function initSpanningTreeExample() {
+            const g = getCommonGraph();
+            drawGraph(g);
+            const result = SpanningTree.run(g, 'A');
+            setupAlgorithmPlayControls(g, result);
+        }
+
+        function setupAlgorithmPlayControls(g, result) {
+            window.algoSteps = result.steps;
+            window.currentStep = 0;
+            window.isPlaying = false;
+            window.playInterval = null;
+
+            document.getElementById('btn-play').addEventListener('click', () => {
+                if(!window.isPlaying && window.currentStep < window.algoSteps.length) {
+                    window.isPlaying = true;
+                    updateButtonUI('running');
+                    const speed = document.getElementById('speed-slider').value;
+                    window.playInterval = setInterval(playNextStep, speed);
+                }
+            });
+
+            document.getElementById('btn-pause').addEventListener('click', () => {
+                if(window.isPlaying) {
+                    window.isPlaying = false;
+                    clearInterval(window.playInterval);
+                    updateButtonUI('paused');
+                } else if (window.currentStep > 0 && window.currentStep < window.algoSteps.length) {
+                    window.isPlaying = true;
+                    updateButtonUI('running');
+                    const speed = document.getElementById('speed-slider').value;
+                    window.playInterval = setInterval(playNextStep, speed);
+                }
+            });
+
+            document.getElementById('btn-step').addEventListener('click', () => {
+                if(!window.isPlaying) {
+                    playNextStep();
+                    if (window.currentStep > 0 && window.currentStep < window.algoSteps.length) {
+                         updateButtonUI('paused');
+                    }
+                }
+            });
+
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                window.isPlaying = false;
+                clearInterval(window.playInterval);
+                window.currentStep = 0;
+                
+                updateButtonUI('default');
+
+                document.getElementById('log-container').innerHTML = '';
+                resetGraphColors(g);
+                
+                if(result.distances) updateTableInit();
+                else document.getElementById('distance-table').getElementsByTagName('tbody')[0].innerHTML = '';
+            });
+
+            if(result.distances) updateTableInit();
+            else document.getElementById('distance-table').getElementsByTagName('tbody')[0].innerHTML = '';
+        }
+
+        // --- BUTTON STATE MANAGER ---
+        function updateButtonUI(state) {
+            const btnPlay = document.getElementById('btn-play');
+            const playSpan = btnPlay.querySelector('span');
+            const btnPause = document.getElementById('btn-pause');
+
+            if (state === 'running') {
+                btnPlay.className = 'btn btn-playing';
+                playSpan.textContent = 'Çalışıyor';
+                btnPlay.style.pointerEvents = 'none'; // Tıklamayı engelle
+                
+                btnPause.className = 'btn btn-paused';
+                btnPause.textContent = 'Duraklat';
+            } else if (state === 'paused') {
+                btnPlay.className = 'btn btn-paused-state';
+                playSpan.textContent = 'Duraklatıldı';
+                btnPlay.style.pointerEvents = 'none';
+
+                btnPause.className = 'btn btn-resume';
+                btnPause.textContent = 'Devam Et';
+            } else if (state === 'default') {
+                btnPlay.className = 'btn';
+                playSpan.textContent = 'Başlat';
+                btnPlay.style.pointerEvents = 'auto'; // Tıklamayı geri aç
+
+                btnPause.className = 'btn';
+                btnPause.textContent = 'Duraklat';
+            }
+        }
+
+        function playNextStep() {
+            if (window.currentStep >= window.algoSteps.length) {
+                window.isPlaying = false;
+                clearInterval(window.playInterval);
+                updateButtonUI('default');
+                addLogLine("Algoritma tamamlandı.", "finish");
+                return;
+            }
+
+            const step = window.algoSteps[window.currentStep];
+            addLogLine(`[${step.type.toUpperCase()}] ${step.description}`, step.type);
+            if(step.distances) updateTable(step.distances);
+            updateGraphVisuals(step);
+            
+            window.currentStep++;
+        }
+
+        function addLogLine(text, type) {
+            const container = document.getElementById('log-container');
+            const div = document.createElement('div');
+            div.textContent = text;
+            div.className = `log-line log-type-${type}`;
+            container.appendChild(div);
+            // Sona kaydır
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateTableInit() {
+            const tbody = document.getElementById('distance-table').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            ['A','B','C','D','E','F','Z'].forEach(n => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td style="font-weight: 600;">${n}</td><td>&infin;</td>`;
+                tr.id = `row-${n}`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateTable(distances) {
+            for (const [node, dist] of Object.entries(distances)) {
+                const row = document.getElementById(`row-${node}`);
+                if (row) {
+                    const displayDist = dist === Infinity ? '&infin;' : dist;
+                    row.cells[1].innerHTML = displayDist;
+                }
+            }
+        }
+
+        function drawGraph(graph) {
+            const svg = document.getElementById('graph-svg');
+            const edges = graph.getAllEdges();
+            const drawnEdges = new Set();
+
+            for (const e of edges) {
+                const edgeKey1 = `${e.from}-${e.to}`;
+                const edgeKey2 = `${e.to}-${e.from}`;
+                if (drawnEdges.has(edgeKey1) || drawnEdges.has(edgeKey2)) continue;
+                drawnEdges.add(edgeKey1);
+
+                const fromNode = graph.nodes[e.from];
+                const toNode = graph.nodes[e.to];
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", fromNode.x);
+                line.setAttribute("y1", fromNode.y);
+                line.setAttribute("x2", toNode.x);
+                line.setAttribute("y2", toNode.y);
+                line.setAttribute("id", `edge-${e.from}-${e.to}`);
+                line.style.stroke = "var(--text-secondary)";
+                line.style.strokeWidth = "3";
+                line.style.transition = "stroke 0.3s ease, stroke-width 0.3s ease";
+                svg.appendChild(line);
+
+                const mx = (fromNode.x + toNode.x) / 2;
+                const my = (fromNode.y + toNode.y) / 2 - 12;
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", mx);
+                text.setAttribute("y", my);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "var(--text-secondary)");
+                text.setAttribute("font-weight", "600");
+                text.setAttribute("font-size", "14px");
+                text.textContent = e.weight;
+                svg.appendChild(text);
+            }
+
+            for (const [id, node] of Object.entries(graph.nodes)) {
+                const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", node.x);
+                circle.setAttribute("cy", node.y);
+                circle.setAttribute("r", 22);
+                circle.setAttribute("id", `node-${id}`);
+                circle.style.fill = "var(--bg-primary)";
+                circle.style.stroke = "var(--accent-color)";
+                circle.style.strokeWidth = "3";
+                circle.style.transition = "all 0.3s ease";
+                group.appendChild(circle);
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", node.x);
+                text.setAttribute("y", node.y);
+                text.setAttribute("alignment-baseline", "middle");
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "var(--text-primary)");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = node.label;
+                group.appendChild(text);
+
+                svg.appendChild(group);
+            }
+        }
+
+        function resetGraphColors(graph) {
+            const nodes = document.querySelectorAll('circle');
+            nodes.forEach(n => {
+                n.style.fill = "var(--bg-primary)";
+                n.style.stroke = "var(--accent-color)";
+                n.style.r = "22"; // Normal boyut
+            });
+
+            const edges = document.querySelectorAll('line');
+            edges.forEach(e => {
+                e.style.stroke = "var(--text-secondary)";
+                e.style.strokeWidth = "3";
+            });
+        }
+
+        function updateGraphVisuals(step) {
+            resetGraphColors(new Graph());
+
+            const visitedColor = "rgba(0, 122, 255, 0.2)"; // Soft mavi
+            const activeColor = "#FFD60A"; // Sarımsı aktif renk
+            const activeStroke = "#FF9F0A"; // Turuncu çerçeve
+            
+            // Eğer temamız gece moduysa vurgular daha parlak görünecektir
+
+            step.visitedNodes.forEach(id => {
+                const nodeEl = document.getElementById(`node-${id}`);
+                if (nodeEl) {
+                    nodeEl.style.fill = visitedColor;
+                }
+            });
+
+            if (step.activeNode) {
+                const nodeEl = document.getElementById(`node-${step.activeNode}`);
+                if (nodeEl) {
+                    nodeEl.style.fill = activeColor;
+                    nodeEl.style.stroke = activeStroke;
+                    nodeEl.style.r = "25"; // Aktif node biraz büyüsün
+                }
+            }
+
+            if (step.activeEdge) {
+                const {from, to} = step.activeEdge;
+                let edgeEl = document.getElementById(`edge-${from}-${to}`);
+                if (!edgeEl) edgeEl = document.getElementById(`edge-${to}-${from}`);
+                
+                if (edgeEl) {
+                    edgeEl.style.stroke = activeStroke;
+                    edgeEl.style.strokeWidth = "6";
+                }
+            }
+        }
+        // --- TAG (SEKME) DEĞİŞTİRİCİ ---
+        document.getElementById('tab-ilerleme').addEventListener('click', () => {
+            document.getElementById('tab-ilerleme').classList.add('active');
+            document.getElementById('tab-aciklama').classList.remove('active');
+            document.getElementById('execution-log').style.display = 'block';
+            document.getElementById('algorithm-description').style.display = 'none';
+        });
+
+        document.getElementById('tab-aciklama').addEventListener('click', () => {
+            document.getElementById('tab-aciklama').classList.add('active');
+            document.getElementById('tab-ilerleme').classList.remove('active');
+            document.getElementById('execution-log').style.display = 'none';
+            document.getElementById('algorithm-description').style.display = 'block';
+        });
+
+    </script>
+</body>
+</html>

@@ -1,1 +1,297 @@
-/* Algoritma sayfası stilleri */
+/* ============================================
+   ALGORİTMA SAYFASI STİLLERİ (algorithm-page.css)
+   Sol graf paneli, sağ bilgi paneli ve kontroller
+   ============================================ */
+
+/* Ana Konteyner - İkiye Bölünmüş Düzen */
+.algo-container {
+    display: flex;
+    height: calc(100vh - 56px); /* Navbar yüksekliği çıkarıldı */
+    margin-top: 56px;
+    background-color: var(--bg-primary);
+}
+
+/* ─── SOL PANEL (Görselleştirme) ─── */
+.visualization-panel {
+    flex: 6; /* %60 alan */
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    position: relative;
+    background-color: var(--bg-secondary);
+}
+
+.canvas-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#graph-svg {
+    width: 100%;
+    height: 100%;
+    /* viewBox ile otomatik esneme sağlanır (JS tarafında set ediliyor) */
+}
+
+/* Kontrol Çubuğu (Altta) */
+.controls-bar {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 12px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+}
+
+/* Buton Stilleri (Temaya uygun Apple tarzı butonlar) */
+.controls-bar .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.controls-bar .btn:hover {
+    background-color: var(--border-color);
+    transform: translateY(-1px);
+}
+
+.controls-bar .btn:active {
+    transform: scale(0.95);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* "Başlat" butonu için özel vurgu */
+#btn-play {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Metin ile spinner arası */
+}
+
+#btn-play:hover {
+    background-color: #0062cc; /* Biraz daha koyu mavi */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 122, 255, 0.3);
+}
+
+#btn-play:active {
+    transform: scale(0.95);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Oynatılırken Başlat Butonu (Yeşil) */
+#btn-play.btn-playing {
+    background-color: #34C759; /* Apple Yeşili */
+}
+
+#btn-play.btn-playing:hover {
+    background-color: #2EAB4D;
+    box-shadow: 0 4px 8px rgba(52, 199, 89, 0.3);
+}
+
+/* Duraklatıldı Butonu (Kırmızı) */
+#btn-pause.btn-paused {
+    background-color: #FF3B30; /* Apple Kırmızısı */
+    color: white;
+    border-color: #FF3B30;
+}
+
+#btn-pause.btn-paused:hover {
+    background-color: #D7332A;
+    box-shadow: 0 4px 8px rgba(255, 59, 48, 0.3);
+}
+
+/* Spinner Animasyonu */
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: none;
+}
+
+#btn-play.btn-playing .spinner {
+    display: block;
+}
+
+/* Duraklatıldığında Başlat Butonu (Turuncu) */
+#btn-play.btn-paused-state {
+    background-color: #FF9F0A; /* Apple Turuncusu */
+}
+
+#btn-play.btn-paused-state .spinner {
+    display: block;
+    /* Dönen halkayı durdurmak için: */
+    animation-play-state: paused;
+}
+
+/* Duraklatıldıktan Sonra Devam Et Butonu (Yeşil) */
+#btn-pause.btn-resume {
+    background-color: #34C759; /* Apple Yeşili */
+    color: white;
+    border-color: #34C759;
+}
+
+#btn-pause.btn-resume:hover {
+    background-color: #2EAB4D;
+    box-shadow: 0 4px 8px rgba(52, 199, 89, 0.3);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hız Ayracı */
+.speed-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto; /* Sağa yasla */
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.speed-control input[type="range"] {
+    accent-color: var(--accent-color);
+    width: 100px;
+    cursor: pointer;
+}
+
+
+/* ─── SAĞ PANEL (Bilgi ve Günlük) ─── */
+.info-panel {
+    flex: 4; /* %40 alan */
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: var(--bg-primary);
+    overflow: hidden; /* Dış kaydırmayı engelle */
+}
+
+/* Sekmeler */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+}
+
+.tab-btn.active {
+    color: var(--text-primary);
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+/* Log ve Tablo Bölümü (Dikey Flex) */
+#execution-log {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow: hidden; /* İçeriklerin taşmasını yönetmek için */
+}
+
+.panel-section {
+    background-color: var(--bg-secondary);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-section h3 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+/* Tablo */
+#distance-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+#distance-table th {
+    padding: 8px 0;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+#distance-table td {
+    padding: 8px 0;
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+/* Log Konteyner (Kayan Alan) */
+.log-wrapper {
+    flex: 1; /* Kalan tüm yüksekliği al */
+    display: flex;
+    flex-direction: column;
+    min-height: 200px; /* En az belli bir alan kaplasın */
+}
+
+#log-container {
+    flex: 1;
+    overflow-y: auto;
+    font-family: 'Courier New', Courier, monospace; /* Klasik log fontu */
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    padding-right: 5px;
+}
+
+/* Özel Scrollbar */
+#log-container::-webkit-scrollbar {
+    width: 6px;
+}
+#log-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.log-line {
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+    line-height: 1.4;
+}
+
+/* Özel Log Renkleri */
+.log-type-init { color: #8E8E93; } /* Gri */
+.log-type-visit { color: var(--accent-color); font-weight: bold; } /* Mavi */
+.log-type-relax { color: #34C759; } /* Yeşil */
+.log-type-finish { color: #FF9F0A; font-weight: bold; } /* Turuncu */
