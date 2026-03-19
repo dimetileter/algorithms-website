@@ -30,11 +30,28 @@
         </div>
     </nav>
 
+    <!-- Mod Geçiş Çubuğu -->
+    <div id="mode-bar">
+        <button id="btn-mode-viz" class="mode-btn active">&#128249; Görselleştirme</button>
+        <button id="btn-mode-build" class="mode-btn">&#9998; İnşaa Modu</button>
+    </div>
+
     <!-- İkiye Bölünmüş Sayfa Düzeni -->
     <main class="algo-container">
         
         <!-- Sol Panel: Graph Görselleştirme Alanı -->
         <section class="visualization-panel">
+
+            <!-- İnşaa Modu Araç Çubuğu (yalnızca Build Mode'da görünür) -->
+            <div id="build-toolbar" style="display:none;">
+                <button class="build-tool-btn active" data-tool="select" title="Seç / Taşı">&#9654; Seç</button>
+                <button class="build-tool-btn" data-tool="addNode" title="Node Ekle">&#9711; Node</button>
+                <button class="build-tool-btn" data-tool="addEdge" title="Kenar Çiz">&#8604; Kenar</button>
+                <button class="build-tool-btn" data-tool="delete" title="Sil">&#128465; Sil</button>
+                <div class="build-toolbar-divider"></div>
+                <button id="btn-clear-graph" title="Tüm Grafu Temizle">&#10006; Temizle</button>
+            </div>
+
             <div class="canvas-container">
                 <!-- SVG'ye viewBox ekleyerek duyarlı (responsive) boyutlandırma sağlandı -->
                 <svg id="graph-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
@@ -50,6 +67,15 @@
                 <button id="btn-pause" class="btn">Duraklat</button>
                 <button id="btn-step" class="btn">İleri Adım</button>
                 <button id="btn-reset" class="btn">Sıfırla</button>
+                <!-- Build Mode: Başlangıç ve bitiş node seçimleri -->
+                <div id="node-selectors" style="display:none; align-items:center; gap:8px;">
+                    <select id="start-node-select" class="node-select-dropdown">
+                        <option value="">Başlangıç...</option>
+                    </select>
+                    <select id="end-node-select" class="node-select-dropdown">
+                        <option value="">Bitiş...</option>
+                    </select>
+                </div>
                 <div class="speed-control">
                     <label for="speed-slider">Hız:</label>
                     <input type="range" id="speed-slider" min="100" max="2000" value="1000" style="direction: rtl;">
@@ -117,6 +143,7 @@
 
     <!-- Uygulama Dosyaları -->
     <script src="../js/theme.js"></script>
+    <script src="../js/graph-builder.js"></script>
     
     <!-- Görselleştirme Mantığı -->
     <script>
@@ -124,6 +151,93 @@
             const urlParams = new URLSearchParams(window.location.search);
             const algo = urlParams.get('algo');
             
+            // Hangi algoritmalar başlangıç/bitiş node gerektiriyor
+            const needsEndNode = ['dijkstra', 'bellman-ford'];
+
+            // Sayfa yüklenince Görselleştirme modu varsayılan
+            _initVisualizationMode(algo);
+
+            // ─── MOD GEÇİŞİ ──────────────────────────────────────────
+            document.getElementById('btn-mode-viz').addEventListener('click', () => {
+                if (!document.getElementById('btn-mode-viz').classList.contains('active')) {
+                    _switchToVizMode(algo);
+                }
+            });
+
+            document.getElementById('btn-mode-build').addEventListener('click', () => {
+                if (!document.getElementById('btn-mode-build').classList.contains('active')) {
+                    _switchToBuildMode(algo, needsEndNode);
+                }
+            });
+
+            // ─── ARAÇ SEÇİMİ ─────────────────────────────────────────
+            document.querySelectorAll('.build-tool-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    BuildMode.setTool(btn.dataset.tool);
+                });
+            });
+
+            // Başlat butonu — Build Mode aktifse kendi graph’ına yönlendir
+            document.getElementById('btn-play').addEventListener('click', () => {
+                const inBuildMode = document.getElementById('btn-mode-build').classList.contains('active');
+                if (inBuildMode && !window.isPlaying) {
+                    _runAlgorithmOnBuiltGraph(algo);
+                }
+            });
+
+            // Temizle butonu
+            document.getElementById('btn-clear-graph').addEventListener('click', () => {
+                BuildMode.reset();
+                document.getElementById('log-container').innerHTML = '';
+                _resetDropdowns();
+            });
+        });
+
+        // ─── GÖRSELLEŞTIRME MODUNA GEÇİŞ ─────────────────────────────
+        function _switchToVizMode(algo) {
+            BuildMode.disable();
+
+            document.getElementById('btn-mode-viz').classList.add('active');
+            document.getElementById('btn-mode-build').classList.remove('active');
+            document.getElementById('build-toolbar').style.display = 'none';
+            document.getElementById('node-selectors').style.display = 'none';
+
+            // Algoritmayı yeniden yükle
+            _initVisualizationMode(algo);
+        }
+
+        // ─── İNŞAA MODUNA GEÇİŞ ──────────────────────────────────────
+        function _switchToBuildMode(algo, needsEndNode) {
+            // Çalışan algoritma varsa durdur
+            if (window.isPlaying) {
+                window.isPlaying = false;
+                clearInterval(window.playInterval);
+                updateButtonUI('default');
+            }
+
+            document.getElementById('btn-mode-build').classList.add('active');
+            document.getElementById('btn-mode-viz').classList.remove('active');
+            document.getElementById('build-toolbar').style.display = 'flex';
+
+            // Bitiş seçimi sadece ilgili algoritmalar için göster
+            const selectors = document.getElementById('node-selectors');
+            selectors.style.display = 'flex';
+            document.getElementById('end-node-select').style.display =
+                needsEndNode.includes(algo) ? 'block' : 'none';
+
+            // SVG'yi temizle ve Build Mode'u etkinleştir
+            BuildMode.enable();
+            document.getElementById('log-container').innerHTML = '';
+        }
+
+        /** Sayfa ilk yüklenince veya Viz moduna dönünce örnek grafu çizer. */
+        function _initVisualizationMode(algo) {
+            BuildMode.clearSvg();
+
+            // SVG'yi temizle (drawGraph yeniden çizer)
+            const svg = document.getElementById('graph-svg');
+            while (svg.firstChild) svg.removeChild(svg.firstChild);
+
             if (algo === 'dijkstra') {
                 document.getElementById('algo-title').textContent = "Dijkstra Algoritması";
                 initDijkstraExample();
@@ -143,7 +257,59 @@
                 document.getElementById('algo-title').textContent = "Bilinmeyen Algoritma (Dijkstra Gösteriliyor)";
                 initDijkstraExample();
             }
-        });
+        }
+
+        /** Dropdown'ları sıfırlar. */
+        function _resetDropdowns() {
+            document.getElementById('start-node-select').innerHTML = '<option value="">Başlangıç...</option>';
+            document.getElementById('end-node-select').innerHTML   = '<option value="">Bitiş...</option>';
+        }
+
+        /**
+         * Build Mode'dan algoritma çalıştırmak için kullanıcının kendi graph’ını
+         * alır ve gerekli başlangıç/bitiş seçimlerini kontrol eder.
+         */
+        function _runAlgorithmOnBuiltGraph(algo) {
+            const g = BuildMode.getGraph();
+            if (g.isEmpty()) {
+                _showBuildWarning('Graph boş! Önce node ve kenar ekleyin.');
+                return;
+            }
+
+            const startId = document.getElementById('start-node-select').value;
+            const endId   = document.getElementById('end-node-select').value;
+            const needsEnd = ['dijkstra', 'bellman-ford'].includes(algo);
+
+            if (!startId) {
+                _showBuildWarning('Lütfen bir başlangıç node seçin!');
+                return;
+            }
+            if (needsEnd && !endId) {
+                _showBuildWarning('Lütfen bir bitiş node seçin!');
+                return;
+            }
+
+            // Algoritma sonuçlarını hesapla
+            let result;
+            if (algo === 'dijkstra')     result = Dijkstra.run(g, startId, endId);
+            else if (algo === 'bellman-ford') result = BellmanFord.run(g, startId, endId);
+            else if (algo === 'kruskal') result = Kruskal.run(g);
+            else if (algo === 'prim')    result = Prim.run(g, startId);
+            else if (algo === 'spanning-tree') result = SpanningTree.run(g, startId);
+            else return;
+
+            setupAlgorithmPlayControls(g, result);
+        }
+
+        /** Build Mode'da uyarı banner’ını gösterir. */
+        function _showBuildWarning(msg) {
+            document.getElementById('warning-banner')?.remove();
+            const banner = document.createElement('div');
+            banner.id = 'warning-banner';
+            banner.textContent = msg;
+            document.querySelector('.visualization-panel').appendChild(banner);
+            setTimeout(() => banner.remove(), 3000);
+        }
 
         function getCommonGraph() {
             const g = new Graph(false);
@@ -203,6 +369,13 @@
             window.currentStep = 0;
             window.isPlaying = false;
             window.playInterval = null;
+
+            // Önceki listener'ları temizlemek için butonları clone-replace ile sıfırla
+            ['btn-play','btn-pause','btn-step','btn-reset'].forEach(id => {
+                const el = document.getElementById(id);
+                const clone = el.cloneNode(true);
+                el.parentNode.replaceChild(clone, el);
+            });
 
             document.getElementById('btn-play').addEventListener('click', () => {
                 if(!window.isPlaying && window.currentStep < window.algoSteps.length) {

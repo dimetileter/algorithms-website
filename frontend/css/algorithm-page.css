@@ -295,3 +295,251 @@
 .log-type-visit { color: var(--accent-color); font-weight: bold; } /* Mavi */
 .log-type-relax { color: #34C759; } /* Yeşil */
 .log-type-finish { color: #FF9F0A; font-weight: bold; } /* Turuncu */
+.log-type-add { color: #BF5AF2; } /* Mor — Build Mode eklemeleri */
+.log-type-warning { color: #FF9F0A; font-style: italic; } /* Uyarı */
+
+
+/* ============================================
+   İNŞAA MODU STİLLERİ
+   ============================================ */
+
+/* Mod Geçiş Çubuğu (Navbar'ın hemen altında) */
+#mode-bar {
+    position: fixed;
+    top: 56px; /* navbar yüksekliği */
+    left: 0;
+    right: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 40px;
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    height: 44px;
+}
+
+/* Mode bar açıkken algo-container'ı aşağı it */
+.algo-container {
+    margin-top: calc(56px + 44px); /* navbar + mode-bar */
+    height: calc(100vh - 56px - 44px);
+}
+
+.mode-btn {
+    padding: 5px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.mode-btn.active {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* İnşaa Modu Araç Çubuğu (Sol Panelin Tepesinde) */
+#build-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+    flex-shrink: 0;
+}
+
+.build-tool-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.build-tool-btn:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.build-tool-btn.active {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* Temizle butonu — kırmızımsı vurgu */
+#btn-clear-graph {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid #FF3B30;
+    background-color: transparent;
+    color: #FF3B30;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#btn-clear-graph:hover {
+    background-color: #FF3B30;
+    color: white;
+}
+
+/* Dikey ayırıcı */
+.build-toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background-color: var(--border-color);
+    margin: 0 4px;
+}
+
+/* Başlangıç / Bitiş Node Seçim Dropdownları */
+.node-select-dropdown {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.node-select-dropdown:focus {
+    border-color: var(--accent-color);
+}
+
+/* Popup Overlay (Node adı / Kenar ağırlığı girişi) */
+#build-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.build-popup {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px 28px;
+    min-width: 280px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(12px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.build-popup h4 {
+    margin: 0 0 14px 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.build-popup input[type="text"],
+.build-popup input[type="number"] {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.build-popup input:focus {
+    border-color: var(--accent-color);
+}
+
+.build-popup-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    justify-content: flex-end;
+}
+
+.build-popup-actions button {
+    padding: 7px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.popup-btn-confirm {
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 600;
+}
+
+.popup-btn-confirm:hover {
+    background-color: #0062cc;
+}
+
+.popup-btn-cancel {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color) !important;
+}
+
+.popup-btn-cancel:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Uyarı Banner'ı (algoritma çalıştırma öncesi eksik seçim) */
+#warning-banner {
+    position: absolute;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #FF9F0A;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(255, 159, 10, 0.4);
+    animation: fadeIn 0.2s ease;
+    z-index: 50;
+    white-space: nowrap;
+}
+
+/* Build Mode SVG Cursor İpuçları */
+.svg-cursor-addNode { cursor: cell; }
+.svg-cursor-addEdge { cursor: crosshair; }
+.svg-cursor-delete  { cursor: not-allowed; }
+.svg-cursor-select  { cursor: default; }

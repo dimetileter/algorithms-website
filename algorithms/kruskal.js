@@ -22,32 +22,28 @@ const Kruskal = {
         });
 
         // --- INLINE DISJOINT SET (UNION-FIND) ---
+        // Basit varyasyon: path compression ve union by rank kullanılmaz
         const parent = {};
-        const rank = {};
-        
+
         for (const id of nodeIds) {
             parent[id] = id;
-            rank[id] = 0;
         }
 
+        // Kökü yukarı doğru takip ederek bul
         function find(i) {
-            if (parent[i] === i) return i;
-            return parent[i] = find(parent[i]); // Path compression
+            while (parent[i] !== i) {
+                i = parent[i];
+            }
+            return i;
         }
 
+        // İki kümeyi birleştir: rootI'yi rootJ'ye bağla
         function union(i, j) {
             const rootI = find(i);
             const rootJ = find(j);
 
             if (rootI !== rootJ) {
-                if (rank[rootI] < rank[rootJ]) {
-                    parent[rootI] = rootJ;
-                } else if (rank[rootI] > rank[rootJ]) {
-                    parent[rootJ] = rootI;
-                } else {
-                    parent[rootJ] = rootI;
-                    rank[rootI]++;
-                }
+                parent[rootI] = rootJ;
                 return true;
             }
             return false;
