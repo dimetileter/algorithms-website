@@ -18,7 +18,7 @@ const Dijkstra = {
      */
     run(graph, startId, endId = null) {
 
-        // Hata kontrolü: başlangıç node var mı?
+        // başlangıç node var mı
         if (!graph.nodes[startId]) {
             console.error(`Dijkstra Hatası: '${startId}' node bulunamadı.`);
             return null;
@@ -26,15 +26,15 @@ const Dijkstra = {
 
         const nodeIds = graph.getNodeIds();
 
-        // ─── Başlangıç durumu ────────────────────────────────────────
+        //Başlangıç durumu 
 
         // Tüm mesafeleri sonsuz olarak başlat
         const distances = {};
-        // Her node'un önceki node'u (yolu geri izlemek için)
+        // Her node'un önceki node'u
         const previous  = {};
         // Ziyaret edilen node'lar kümesi
         const visited   = new Set();
-        // Adım kayıtları (görselleştirici için)
+        // Adım kayıtları 
         const steps     = [];
 
         for (const id of nodeIds) {
@@ -57,14 +57,14 @@ const Dijkstra = {
             description:  `Başlangıç: '${startId}' node'u kuyruğa eklendi, mesafe = 0.`
         });
 
-        // ─── Ana Döngü ────────────────────────────────────────────────
+        // Ana Döngü
 
         while (!pq.isEmpty()) {
 
-            // En düşük mesafeli node'u al
+            // En düşük mesafeli node
             const { value: currentId, priority: currentDist } = pq.dequeue();
 
-            // Zaten ziyaret edildiyse atla
+            // Ziyaret edildiyse atla
             if (visited.has(currentId)) continue;
             visited.add(currentId);
 
@@ -91,7 +91,7 @@ const Dijkstra = {
                 description:  `'${currentId}' node'u ziyaret ediliyor (mesafe: ${currentDist}).`
             });
 
-            // ─── Komşuları gez ───────────────────────────────────────
+            // Komşuları gez
 
             const neighbors = graph.getNeighbors(currentId);
 
@@ -121,7 +121,7 @@ const Dijkstra = {
             }
         }
 
-        // ─── Sonuç: En kısa yolu geri iz ─────────────────────────────
+        //Sonuç: En kısa yolu geri iz
 
         const shortestPath = this._buildPath(previous, startId, endId);
         const totalDistance = endId ? distances[endId] : null;

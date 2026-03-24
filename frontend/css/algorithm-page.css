@@ -298,6 +298,34 @@
 .log-type-add { color: #BF5AF2; } /* Mor — Build Mode eklemeleri */
 .log-type-warning { color: #FF9F0A; font-style: italic; } /* Uyarı */
 
+/* Algoritma Sonuç Kutusu */
+.result-box {
+    background: linear-gradient(135deg, rgba(52, 199, 89, 0.08), rgba(52, 199, 89, 0.02));
+    border: 1px solid rgba(52, 199, 89, 0.3) !important;
+    animation: resultSlideIn 0.35s ease;
+}
+
+.result-box h3 {
+    color: #34C759 !important;
+    font-size: 0.95rem !important;
+}
+
+.result-box p {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.result-box p strong {
+    color: var(--accent-color);
+}
+
+@keyframes resultSlideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 
 /* ============================================
    İNŞAA MODU STİLLERİ
@@ -543,3 +571,146 @@
 .svg-cursor-addEdge { cursor: crosshair; }
 .svg-cursor-delete  { cursor: not-allowed; }
 .svg-cursor-select  { cursor: default; }
+
+
+/* ============================================
+   ALGORİTMA AÇIKLAMA STİLLERİ
+   ============================================ */
+
+#algorithm-description {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Açıklama Başlığı */
+.desc-heading {
+    color: var(--accent-color);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+}
+
+/* Kısa özet paragraf */
+.desc-summary {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin: 0 0 18px 0;
+}
+
+.desc-summary strong {
+    color: var(--text-primary);
+}
+
+/* Bölüm kartları */
+.desc-section {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+}
+
+.desc-section h4 {
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+/* Adım listesi */
+.desc-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.desc-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Örnek metin */
+.desc-example-text {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0 0 10px 0;
+}
+
+/* Mini graf gösterimi (yan yana) */
+.desc-graph-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.desc-graph-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px 8px;
+}
+
+.desc-graph-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.desc-mini-graph {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+}
+
+/* Karmaşıklık tablosu */
+.desc-complexity-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.desc-complexity-table td {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+    color: var(--text-primary);
+}
+
+.desc-complexity-table td:first-child {
+    font-weight: 600;
+    color: var(--text-secondary);
+    width: 100px;
+}
+
+.desc-complexity-table code {
+    background: rgba(0, 122, 255, 0.08);
+    color: var(--accent-color);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}

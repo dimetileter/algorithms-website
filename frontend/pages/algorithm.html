@@ -78,7 +78,7 @@
                 </div>
                 <div class="speed-control">
                     <label for="speed-slider">Hız:</label>
-                    <input type="range" id="speed-slider" min="100" max="2000" value="1000" style="direction: rtl;">
+                    <input type="range" id="speed-slider" min="50" max="2000" value="800">
                 </div>
             </div>
         </section>
@@ -108,6 +108,12 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Algoritma Sonucu (En kısa yol / MST ağırlığı) -->
+                <div id="shortest-path-result" class="panel-section result-box" style="display: none;">
+                    <h3>📍 Sonuç</h3>
+                    <p id="result-text"></p>
+                </div>
                 
                 <div class="panel-section log-wrapper">
                     <h3>İşlem Adımları</h3>
@@ -118,14 +124,8 @@
             </div>
 
             <!-- Algoritma Açıklama Bölümü (Açıklama Tab'i içeriği) -->
-            <div id="algorithm-description" style="display: none; padding: 20px;">
-                <h3 id="desc-title" style="margin-bottom: 15px; color: var(--accent-color);">Algoritma Mantığı</h3>
-                <p id="desc-content" style="color: var(--text-secondary); line-height: 1.6;">
-                    Bu sekme algoritmanın adım adım nasıl çalıştığını, <b>zaman ve alan karmaşıklığı (Big O Notation)</b> 
-                    bilgilerini ve pseudocode'unu açıklamak üzere ayrılmıştır. 
-                    <br><br>
-                    İlerleyen aşamalarda her algoritmanın kendi detaylı teorik ders notu burada belirecektir.
-                </p>
+            <div id="algorithm-description" style="display: none; padding: 20px; overflow-y: auto;">
+                <!-- İçerik JS tarafından dinamik olarak doldurulacak -->
             </div>
             
         </section>
@@ -257,6 +257,9 @@
                 document.getElementById('algo-title').textContent = "Bilinmeyen Algoritma (Dijkstra Gösteriliyor)";
                 initDijkstraExample();
             }
+
+            // Açıklama sekmesi içeriğini yükle
+            loadAlgorithmDescription(algo);
         }
 
         /** Dropdown'ları sıfırlar. */
@@ -366,9 +369,14 @@
 
         function setupAlgorithmPlayControls(g, result) {
             window.algoSteps = result.steps;
+            window.algoResult = result; // Sonucu sakla (en kısa yol gösterimi için)
             window.currentStep = 0;
             window.isPlaying = false;
             window.playInterval = null;
+
+            // Sonuç kutusunu gizle
+            document.getElementById('shortest-path-result').style.display = 'none';
+            document.getElementById('result-text').textContent = '';
 
             // Önceki listener'ları temizlemek için butonları clone-replace ile sıfırla
             ['btn-play','btn-pause','btn-step','btn-reset'].forEach(id => {
@@ -381,8 +389,8 @@
                 if(!window.isPlaying && window.currentStep < window.algoSteps.length) {
                     window.isPlaying = true;
                     updateButtonUI('running');
-                    const speed = document.getElementById('speed-slider').value;
-                    window.playInterval = setInterval(playNextStep, speed);
+                    const interval = getSpeedInterval();
+                    window.playInterval = setInterval(playNextStep, interval);
                 }
             });
 
@@ -394,8 +402,8 @@
                 } else if (window.currentStep > 0 && window.currentStep < window.algoSteps.length) {
                     window.isPlaying = true;
                     updateButtonUI('running');
-                    const speed = document.getElementById('speed-slider').value;
-                    window.playInterval = setInterval(playNextStep, speed);
+                    const interval = getSpeedInterval();
+                    window.playInterval = setInterval(playNextStep, interval);
                 }
             });
 
@@ -418,12 +426,24 @@
                 document.getElementById('log-container').innerHTML = '';
                 resetGraphColors(g);
                 
+                // Sonuç kutusunu gizle
+                document.getElementById('shortest-path-result').style.display = 'none';
+                document.getElementById('result-text').textContent = '';
+
                 if(result.distances) updateTableInit();
                 else document.getElementById('distance-table').getElementsByTagName('tbody')[0].innerHTML = '';
             });
 
             if(result.distances) updateTableInit();
             else document.getElementById('distance-table').getElementsByTagName('tbody')[0].innerHTML = '';
+            // Hız slider'ı çalışma sırasında değiştiğinde anında güncelle
+            document.getElementById('speed-slider').addEventListener('input', () => {
+                if (window.isPlaying) {
+                    clearInterval(window.playInterval);
+                    const interval = getSpeedInterval();
+                    window.playInterval = setInterval(playNextStep, interval);
+                }
+            });
         }
 
         // --- BUTTON STATE MANAGER ---
@@ -456,12 +476,22 @@
             }
         }
 
+        /** Slider değerini interval süresine (ms) çevirir. Sağ = hızlı, sol = yavaş. */
+        function getSpeedInterval() {
+            const slider = document.getElementById('speed-slider');
+            const min = parseInt(slider.min);
+            const max = parseInt(slider.max);
+            // Slider sağa kaydıkça value artar → interval düşer → hız artar
+            return (max + min) - parseInt(slider.value);
+        }
+
         function playNextStep() {
             if (window.currentStep >= window.algoSteps.length) {
                 window.isPlaying = false;
                 clearInterval(window.playInterval);
                 updateButtonUI('default');
                 addLogLine("Algoritma tamamlandı.", "finish");
+                showAlgorithmResult(); // Sonucu göster
                 return;
             }
 
@@ -471,6 +501,33 @@
             updateGraphVisuals(step);
             
             window.currentStep++;
+        }
+
+        /** Algoritma tamamlandığında sonucu (en kısa yol veya MST ağırlığı) gösterir. */
+        function showAlgorithmResult() {
+            const result = window.algoResult;
+            if (!result) return;
+
+            const resultBox = document.getElementById('shortest-path-result');
+            const resultText = document.getElementById('result-text');
+            const algo = new URLSearchParams(window.location.search).get('algo');
+
+            if (['dijkstra', 'bellman-ford'].includes(algo)) {
+                // En kısa yol gösterimi
+                if (result.shortestPath && result.shortestPath.length > 0) {
+                    const pathStr = result.shortestPath.join(' → ');
+                    resultText.innerHTML = `<strong>En Kısa Yol:</strong> ${pathStr}<br><strong>Toplam Mesafe:</strong> ${result.totalDistance}`;
+                } else {
+                    resultText.innerHTML = '<strong>Hedefe ulaşılamadı!</strong>';
+                }
+            } else if (['kruskal', 'prim'].includes(algo)) {
+                resultText.innerHTML = `<strong>MST Toplam Ağırlığı:</strong> ${result.totalWeight}`;
+            } else if (algo === 'spanning-tree') {
+                const edgeCount = result.treeEdges ? result.treeEdges.length : 0;
+                resultText.innerHTML = `<strong>Spanning Tree:</strong> ${edgeCount} kenar seçildi.`;
+            }
+
+            resultBox.style.display = 'block';
         }
 
         function addLogLine(text, type) {
@@ -635,6 +692,300 @@
             document.getElementById('execution-log').style.display = 'none';
             document.getElementById('algorithm-description').style.display = 'block';
         });
+
+        // ─── ALGORİTMA AÇIKLAMA İÇERİKLERİ ─────────────────────────────
+        /** Her algoritmanın açıklama sekmesine zengin içerik yükler. */
+        function loadAlgorithmDescription(algo) {
+            const container = document.getElementById('algorithm-description');
+            const descriptions = getAlgorithmDescriptions();
+            const content = descriptions[algo] || descriptions['dijkstra'];
+            container.innerHTML = content;
+        }
+
+        /** Tüm algoritmaların açıklama içeriklerini döndürür. */
+        function getAlgorithmDescriptions() {
+            // Ortak mini graf SVG şablonu (A-B-C-D, 4 node basit graf)
+            const miniGraphSVG = `
+                <svg class="desc-mini-graph" viewBox="0 0 320 180">
+                    <line x1="50" y1="50" x2="150" y2="50" stroke="var(--border-color)" stroke-width="2"/>
+                    <line x1="150" y1="50" x2="270" y2="50" stroke="var(--border-color)" stroke-width="2"/>
+                    <line x1="50" y1="50" x2="150" y2="140" stroke="var(--border-color)" stroke-width="2"/>
+                    <line x1="150" y1="50" x2="150" y2="140" stroke="var(--border-color)" stroke-width="2"/>
+                    <line x1="150" y1="140" x2="270" y2="50" stroke="var(--border-color)" stroke-width="2"/>
+                    <text x="95" y="40" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-weight="600">4</text>
+                    <text x="210" y="40" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-weight="600">1</text>
+                    <text x="85" y="105" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-weight="600">7</text>
+                    <text x="140" y="105" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-weight="600">2</text>
+                    <text x="225" y="105" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-weight="600">3</text>
+                    <circle cx="50" cy="50" r="18" fill="var(--accent-color)" opacity="0.15" stroke="var(--accent-color)" stroke-width="2"/>
+                    <text x="50" y="55" text-anchor="middle" fill="var(--accent-color)" font-weight="bold" font-size="14">A</text>
+                    <circle cx="150" cy="50" r="18" fill="var(--bg-secondary)" stroke="var(--accent-color)" stroke-width="2"/>
+                    <text x="150" y="55" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="14">B</text>
+                    <circle cx="270" cy="50" r="18" fill="var(--bg-secondary)" stroke="var(--accent-color)" stroke-width="2"/>
+                    <text x="270" y="55" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="14">D</text>
+                    <circle cx="150" cy="140" r="18" fill="var(--bg-secondary)" stroke="var(--accent-color)" stroke-width="2"/>
+                    <text x="150" y="145" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="14">C</text>
+                </svg>`;
+
+            // Dijkstra için vurgulu yol SVG'si
+            const dijkstraPathSVG = `
+                <svg class="desc-mini-graph" viewBox="0 0 320 180">
+                    <line x1="50" y1="50" x2="150" y2="50" stroke="#34C759" stroke-width="3"/>
+                    <line x1="150" y1="50" x2="270" y2="50" stroke="#34C759" stroke-width="3"/>
+                    <line x1="50" y1="50" x2="150" y2="140" stroke="var(--border-color)" stroke-width="2"/>
+                    <line x1="150" y1="50" x2="150" y2="140" stroke="var(--border-color)" stroke-width="2"/>
+                    <line x1="150" y1="140" x2="270" y2="50" stroke="var(--border-color)" stroke-width="2"/>
+                    <text x="95" y="40" text-anchor="middle" fill="#34C759" font-size="12" font-weight="700">4</text>
+                    <text x="210" y="40" text-anchor="middle" fill="#34C759" font-size="12" font-weight="700">1</text>
+                    <text x="85" y="105" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-weight="600">7</text>
+                    <text x="140" y="105" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-weight="600">2</text>
+                    <text x="225" y="105" text-anchor="middle" fill="var(--text-secondary)" font-size="12" font-weight="600">3</text>
+                    <circle cx="50" cy="50" r="18" fill="rgba(52,199,89,0.2)" stroke="#34C759" stroke-width="2.5"/>
+                    <text x="50" y="55" text-anchor="middle" fill="#34C759" font-weight="bold" font-size="14">A</text>
+                    <circle cx="150" cy="50" r="18" fill="rgba(52,199,89,0.2)" stroke="#34C759" stroke-width="2.5"/>
+                    <text x="150" y="55" text-anchor="middle" fill="#34C759" font-weight="bold" font-size="14">B</text>
+                    <circle cx="270" cy="50" r="18" fill="rgba(52,199,89,0.2)" stroke="#34C759" stroke-width="2.5"/>
+                    <text x="270" y="55" text-anchor="middle" fill="#34C759" font-weight="bold" font-size="14">D</text>
+                    <circle cx="150" cy="140" r="18" fill="var(--bg-secondary)" stroke="var(--accent-color)" stroke-width="2"/>
+                    <text x="150" y="145" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="14">C</text>
+                </svg>`;
+
+            // MST vurgulu SVG (Kruskal/Prim)
+            const mstSVG = `
+                <svg class="desc-mini-graph" viewBox="0 0 320 180">
+                    <line x1="150" y1="50" x2="270" y2="50" stroke="#34C759" stroke-width="3"/>
+                    <line x1="150" y1="50" x2="150" y2="140" stroke="#34C759" stroke-width="3"/>
+                    <line x1="150" y1="140" x2="270" y2="50" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6"/>
+                    <line x1="50" y1="50" x2="150" y2="50" stroke="#34C759" stroke-width="3"/>
+                    <line x1="50" y1="50" x2="150" y2="140" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6"/>
+                    <text x="95" y="40" text-anchor="middle" fill="#34C759" font-size="12" font-weight="700">4</text>
+                    <text x="210" y="40" text-anchor="middle" fill="#34C759" font-size="12" font-weight="700">1</text>
+                    <text x="85" y="105" text-anchor="middle" fill="var(--text-secondary)" font-size="12">7</text>
+                    <text x="140" y="105" text-anchor="middle" fill="#34C759" font-size="12" font-weight="700">2</text>
+                    <text x="225" y="105" text-anchor="middle" fill="var(--text-secondary)" font-size="12">3</text>
+                    <circle cx="50" cy="50" r="18" fill="rgba(52,199,89,0.2)" stroke="#34C759" stroke-width="2.5"/>
+                    <text x="50" y="55" text-anchor="middle" fill="#34C759" font-weight="bold" font-size="14">A</text>
+                    <circle cx="150" cy="50" r="18" fill="rgba(52,199,89,0.2)" stroke="#34C759" stroke-width="2.5"/>
+                    <text x="150" y="55" text-anchor="middle" fill="#34C759" font-weight="bold" font-size="14">B</text>
+                    <circle cx="270" cy="50" r="18" fill="rgba(52,199,89,0.2)" stroke="#34C759" stroke-width="2.5"/>
+                    <text x="270" y="55" text-anchor="middle" fill="#34C759" font-weight="bold" font-size="14">D</text>
+                    <circle cx="150" cy="140" r="18" fill="rgba(52,199,89,0.2)" stroke="#34C759" stroke-width="2.5"/>
+                    <text x="150" y="145" text-anchor="middle" fill="#34C759" font-weight="bold" font-size="14">C</text>
+                </svg>`;
+
+            return {
+                'dijkstra': `
+                    <h3 class="desc-heading">Dijkstra Algoritması</h3>
+                    <p class="desc-summary">Ağırlıklı bir grafta, bir başlangıç düğümünden diğer tüm düğümlere olan <strong>en kısa yolu</strong> bulur. Yalnızca <em>negatif olmayan</em> ağırlıklarda çalışır.</p>
+
+                    <div class="desc-section">
+                        <h4>📌 Nasıl Çalışır?</h4>
+                        <div class="desc-steps">
+                            <div class="desc-step"><span class="step-num">1</span> Başlangıç düğümünün mesafesi 0, diğerleri ∞ olarak ayarlanır.</div>
+                            <div class="desc-step"><span class="step-num">2</span> En küçük mesafeli düğüm seçilir (Öncelik Kuyruğu ile).</div>
+                            <div class="desc-step"><span class="step-num">3</span> Seçilen düğümün komşuları gezilir, daha kısa yol bulunursa mesafe güncellenir (gevşetme).</div>
+                            <div class="desc-step"><span class="step-num">4</span> Adım 2-3, tüm düğümler ziyaret edilene kadar tekrarlanır.</div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>🔍 Örnek</h4>
+                        <p class="desc-example-text">A → D en kısa yol aranıyor. A'dan başlayarak komşular gezilir:</p>
+                        <div class="desc-graph-row">
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">Başlangıç Grafı</span>
+                                ${miniGraphSVG}
+                            </div>
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">En Kısa Yol: A→B→D (5)</span>
+                                ${dijkstraPathSVG}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>⏱️ Karmaşıklık</h4>
+                        <table class="desc-complexity-table">
+                            <tr><td>Zaman</td><td><code>O((V + E) · log V)</code></td></tr>
+                            <tr><td>Alan</td><td><code>O(V)</code></td></tr>
+                        </table>
+                    </div>
+                `,
+
+                'bellman-ford': `
+                    <h3 class="desc-heading">Bellman-Ford Algoritması</h3>
+                    <p class="desc-summary">Dijkstra'ya benzer şekilde en kısa yolu bulur, ancak <strong>negatif ağırlıklı kenarları</strong> da destekler. Ayrıca grafta <em>negatif döngü</em> olup olmadığını tespit edebilir.</p>
+
+                    <div class="desc-section">
+                        <h4>📌 Nasıl Çalışır?</h4>
+                        <div class="desc-steps">
+                            <div class="desc-step"><span class="step-num">1</span> Başlangıç düğümünün mesafesi 0, diğerleri ∞ yapılır.</div>
+                            <div class="desc-step"><span class="step-num">2</span> Tüm kenarlar (V-1) kez tekrar tekrar gevşetilir (relax).</div>
+                            <div class="desc-step"><span class="step-num">3</span> Her iterasyonda daha kısa yol bulunan mesafeler güncellenir.</div>
+                            <div class="desc-step"><span class="step-num">4</span> Son olarak V. iterasyonda tekrar kontrol edilir: eğer hâlâ güncelleme varsa <strong>negatif döngü</strong> vardır.</div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>🔍 Örnek</h4>
+                        <p class="desc-example-text">Aynı graf üzerinde A → D aranır. Bellman-Ford tüm kenarları 3 kez (V-1) tarar:</p>
+                        <div class="desc-graph-row">
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">Grafı Tarıyor (V-1 iterasyon)</span>
+                                ${miniGraphSVG}
+                            </div>
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">Sonuç: A→B→D (5)</span>
+                                ${dijkstraPathSVG}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>⚠️ Dijkstra vs Bellman-Ford</h4>
+                        <table class="desc-complexity-table">
+                            <tr><td>Dijkstra</td><td>Daha hızlı ama negatif kenar <strong>desteklemez</strong></td></tr>
+                            <tr><td>Bellman-Ford</td><td>Daha yavaş ama negatif kenar <strong>destekler</strong></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>⏱️ Karmaşıklık</h4>
+                        <table class="desc-complexity-table">
+                            <tr><td>Zaman</td><td><code>O(V · E)</code></td></tr>
+                            <tr><td>Alan</td><td><code>O(V)</code></td></tr>
+                        </table>
+                    </div>
+                `,
+
+                'kruskal': `
+                    <h3 class="desc-heading">Kruskal Algoritması (MST)</h3>
+                    <p class="desc-summary">Grafın tüm düğümlerini kapsayan, <strong>en küçük toplam ağırlığa</strong> sahip ağacı (Minimum Spanning Tree) bulur. Kenarları ağırlığa göre sıralayarak, döngü oluşturmayan en küçük kenarları seçer.</p>
+
+                    <div class="desc-section">
+                        <h4>📌 Nasıl Çalışır?</h4>
+                        <div class="desc-steps">
+                            <div class="desc-step"><span class="step-num">1</span> Tüm kenarlar ağırlıklarına göre küçükten büyüğe sıralanır.</div>
+                            <div class="desc-step"><span class="step-num">2</span> En küçük kenar alınır. Eğer döngü oluşturmuyorsa ağaca eklenir.</div>
+                            <div class="desc-step"><span class="step-num">3</span> Döngü kontrolü <strong>Union-Find</strong> (Disjoint Set) yapısıyla yapılır.</div>
+                            <div class="desc-step"><span class="step-num">4</span> V-1 kenar eklenince algoritma durur.</div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>🔍 Örnek</h4>
+                        <p class="desc-example-text">Kenarlar sıralanır: (B-D:1), (B-C:2), (C-D:3), (A-B:4), (A-C:7). İlk 3 kenar seçilerek MST oluşur:</p>
+                        <div class="desc-graph-row">
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">Orijinal Graf</span>
+                                ${miniGraphSVG}
+                            </div>
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">MST (Toplam: 7)</span>
+                                ${mstSVG}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>⏱️ Karmaşıklık</h4>
+                        <table class="desc-complexity-table">
+                            <tr><td>Zaman</td><td><code>O(E · log E)</code></td></tr>
+                            <tr><td>Alan</td><td><code>O(V + E)</code></td></tr>
+                        </table>
+                    </div>
+                `,
+
+                'prim': `
+                    <h3 class="desc-heading">Prim Algoritması (MST)</h3>
+                    <p class="desc-summary">Kruskal gibi <strong>Minimum Spanning Tree</strong> bulur, ancak farklı bir yaklaşım kullanır: Bir düğümden başlayarak ağacı <em>büyüterek</em> ilerler. Her adımda ağaca en yakın düğümü ekler.</p>
+
+                    <div class="desc-section">
+                        <h4>📌 Nasıl Çalışır?</h4>
+                        <div class="desc-steps">
+                            <div class="desc-step"><span class="step-num">1</span> Başlangıç düğümü seçilir ve ağaca eklenir.</div>
+                            <div class="desc-step"><span class="step-num">2</span> Ağaçtaki düğümlere komşu olan ve ağaçta olmayan en küçük ağırlıklı kenar bulunur.</div>
+                            <div class="desc-step"><span class="step-num">3</span> Bu kenarın ulaştığı düğüm ağaca eklenir.</div>
+                            <div class="desc-step"><span class="step-num">4</span> Tüm düğümler ağaca eklenene kadar adım 2-3 tekrarlanır.</div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>🔍 Örnek</h4>
+                        <p class="desc-example-text">A'dan başlanır → A-B kenarı (4) eklenir → B-D (1) → B-C (2). Toplam MST ağırlığı: 7</p>
+                        <div class="desc-graph-row">
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">Orijinal Graf</span>
+                                ${miniGraphSVG}
+                            </div>
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">MST (Toplam: 7)</span>
+                                ${mstSVG}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>⚠️ Kruskal vs Prim</h4>
+                        <table class="desc-complexity-table">
+                            <tr><td>Kruskal</td><td>Kenar odaklı, seyrek graflarda daha verimli</td></tr>
+                            <tr><td>Prim</td><td>Düğüm odaklı, yoğun graflarda daha verimli</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>⏱️ Karmaşıklık</h4>
+                        <table class="desc-complexity-table">
+                            <tr><td>Zaman</td><td><code>O((V + E) · log V)</code></td></tr>
+                            <tr><td>Alan</td><td><code>O(V)</code></td></tr>
+                        </table>
+                    </div>
+                `,
+
+                'spanning-tree': `
+                    <h3 class="desc-heading">Spanning Tree (DFS)</h3>
+                    <p class="desc-summary">Bir grafın tüm düğümlerini kapsayan, <strong>döngü içermeyen</strong> alt grafıdır. DFS (Derinlik Öncelikli Arama) kullanılarak oluşturulur. MST'den farklı olarak ağırlık optimizasyonu yapmaz.</p>
+
+                    <div class="desc-section">
+                        <h4>📌 Nasıl Çalışır?</h4>
+                        <div class="desc-steps">
+                            <div class="desc-step"><span class="step-num">1</span> Başlangıç düğümünden DFS başlatılır.</div>
+                            <div class="desc-step"><span class="step-num">2</span> Ziyaret edilmemiş bir komşuya gidilir, kenar ağaca eklenir.</div>
+                            <div class="desc-step"><span class="step-num">3</span> Çıkmaza girildiğinde geri dönülür (backtrack) ve başka dal denenir.</div>
+                            <div class="desc-step"><span class="step-num">4</span> Tüm düğümler ziyaret edildiğinde ağaç tamamlanır.</div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>🔍 Örnek</h4>
+                        <p class="desc-example-text">A'dan DFS başlar → A-B → B-C → B-D yolunu izler. Sonuç: 3 kenar ile spanning tree oluşur.</p>
+                        <div class="desc-graph-row">
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">Orijinal Graf</span>
+                                ${miniGraphSVG}
+                            </div>
+                            <div class="desc-graph-box">
+                                <span class="desc-graph-label">DFS Spanning Tree</span>
+                                ${mstSVG}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>💡 Not</h4>
+                        <p class="desc-example-text">Spanning Tree, MST (Minimum Spanning Tree) değildir. DFS sırasına göre oluşan herhangi bir kapsayan ağaçtır. Bu yüzden ağırlıkları optimize etmek gibi bir hedefi yoktur.</p>
+                    </div>
+
+                    <div class="desc-section">
+                        <h4>⏱️ Karmaşıklık</h4>
+                        <table class="desc-complexity-table">
+                            <tr><td>Zaman</td><td><code>O(V + E)</code></td></tr>
+                            <tr><td>Alan</td><td><code>O(V)</code></td></tr>
+                        </table>
+                    </div>
+                `
+            };
+        }
 
     </script>
 </body>
